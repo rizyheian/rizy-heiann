@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIZY HEIAN</title>
+<style>
+body{margin:0;background:#101114;color:white;font-family:Arial,sans-serif;padding:20px}
+main{max-width:650px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center}
+h1{color:#b7ff5a;font-size:24px}
+.card{background:#1b1c21;border:1px solid #383941;border-radius:16px;padding:20px;margin-top:20px}
+input{box-sizing:border-box;width:100%;padding:14px;background:#101114;color:white;border:1px solid #444;border-radius:10px;margin:10px 0}
+label{display:block;padding:10px;background:#111216;border:1px solid #383941;border-radius:8px;margin:7px 0}
+button{width:100%;padding:15px;background:#b7ff5a;border:0;border-radius:10px;font-weight:bold;margin-top:15px}
+small,p{color:#aaa}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>⚡ RIZY HEIAN</h1>
+<small>LINK ENGINE</small>
+</header>
+<section class="card">
+<p>01 / INPUT</p>
+<h2>Target link</h2>
+<form id="form">
+<input id="url" type="url" placeholder="https://example.com/..." required>
+<p>02 / PROVIDERS</p>
+<h2>Pilih provider</h2>
+<div id="providers"></div>
+<button id="submit">START BYPASS ↗</button>
+</form>
+</section>
+<section class="card">
+<h2>Hasil proses</h2>
+<p id="status">ENGINE STANDBY — Masukkan link untuk memulai.</p>
+<a id="result" target="_blank" rel="noopener noreferrer"></a>
+</section>
+</main>
+<script>
+const names=["Safelinku","TinyURL","Sub4Unlock","Link2Unlock","Platoboost","Linkvertise","Clk.sh","Bitly","ShrinkMe","Tpi.li"];
+const list=document.getElementById("providers");
+names.forEach((name,i)=>{
+ const label=document.createElement("label");
+ const radio=document.createElement("input");
+ radio.type="radio";radio.name="provider";radio.value=name;
+ radio.checked=i===5;
+ label.append(radio,document.createTextNode(" "+name));
+ list.append(label);
+});
+document.getElementById("form").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const url=document.getElementById("url").value.trim();
+ const provider=document.querySelector('input[name="provider"]:checked').value;
+ const status=document.getElementById("status");
+ const result=document.getElementById("result");
+ result.textContent="";result.removeAttribute("href");
+ status.textContent="Memproses permintaan...";
+ try{
+  const response=await fetch("/api/bypass",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({url,provider})
+  });
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||"Permintaan gagal");
+  if(data.status==="success"&&data.result){
+   result.href=data.result;result.textContent=data.result;
+   status.textContent="API mengonfirmasi keberhasilan.";
+  }else if(data.status==="manual"){
+   status.textContent="Tautan ini memerlukan tindakan manual.";
+  }else{
+   status.textContent=data.error||"API belum mengonfirmasi keberhasilan.";
+  }
+ }catch(err){
+  status.textContent="Gagal: "+err.message;
+ }
+});
+</script>
+</body>
+  </html>
